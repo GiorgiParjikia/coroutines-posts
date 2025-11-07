@@ -90,7 +90,7 @@ fun exceptionQuestion4() {
         }
     }
     Thread.sleep(1000)
-    println("catch сработал — coroutineScope отменяет всё при исключении в дочерней корутине.")
+    println("catch сработал — coroutineScope отменяет все дочерние при исключении одной, остальные println не выполняются.")
 }
 
 /*
@@ -114,7 +114,7 @@ fun exceptionQuestion5() {
         }
     }
     Thread.sleep(1000)
-    println("catch сработал — supervisorScope не отменяет соседние корутины, но исключение всё равно ловится.")
+    println("catch сработал — supervisorScope не отменяет соседние корутины, но каждое исключение выводится отдельно (два stack trace).")
 }
 
 /*
@@ -158,5 +158,5 @@ fun exceptionQuestion7() {
         }
     }
     Thread.sleep(1500)
-    println("строка вывелась — SupervisorJob() не отменяет соседние корутины при ошибке одной.")
+    println("строка вывелась, но в консоли есть ошибка — SupervisorJob() не отменяет соседние корутины, однако исключение из родительской launch не перехвачено (оно отображается как unhandled exception).")
 }
