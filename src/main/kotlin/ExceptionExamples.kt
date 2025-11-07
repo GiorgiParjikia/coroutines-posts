@@ -103,18 +103,21 @@ fun exceptionQuestion5() {
             supervisorScope {
                 launch {
                     delay(500)
-                    throw Exception("something bad happened") // <--
+                    println("Первая корутина завершилась с ошибкой") // лог
+                    throw Exception("something bad happened (1)") // <--
                 }
                 launch {
-                    throw Exception("something bad happened")
+                    println("Вторая корутина работает независимо") // лог
+                    throw Exception("something bad happened (2)")
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace() // <--
+            println("catch сработал в родителе supervisorScope") // лог
+            e.printStackTrace()
         }
     }
     Thread.sleep(1000)
-    println("catch сработал — supervisorScope не отменяет соседние корутины, но каждое исключение выводится отдельно (два stack trace).")
+    println("supervisorScope не отменяет соседние корутины, но исключения в каждой из них выводятся отдельно (два stack trace).")
 }
 
 /*
@@ -145,18 +148,21 @@ fun exceptionQuestion6() {
 fun exceptionQuestion7() {
     println("\nQuestion 7:")
     CoroutineScope(EmptyCoroutineContext).launch {
-        CoroutineScope(EmptyCoroutineContext + SupervisorJob()).launch {
-            launch {
-                delay(1000)
-                println("ok") // <--
-            }
-            launch {
-                delay(500)
-                println("ok")
-            }
-            throw Exception("something bad happened")
+        val scope = CoroutineScope(SupervisorJob())
+
+        scope.launch {
+            delay(1000)
+            println("ok") // теперь выведется
         }
+
+        scope.launch {
+            delay(500)
+            println("ok")
+        }
+
+        throw Exception("something bad happened")
     }
+
     Thread.sleep(1500)
-    println("строка вывелась, но в консоли есть ошибка — SupervisorJob() не отменяет соседние корутины, однако исключение из родительской launch не перехвачено (оно отображается как unhandled exception).")
+    println("в консоли выводятся оба ok, исключение выше не мешает их выполнению.")
 }
